@@ -1,0 +1,450 @@
+<!-- templates/index.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AI Face Recognition Attendance System</title>
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Montserrat:wght@500;600;700;800&display=swap" rel="stylesheet">
+  <!-- Chart.js CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <!-- Stylesheet -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+
+  <div class="app-container">
+    
+    <!-- Sidebar Navigation -->
+    <aside class="sidebar">
+      <div class="logo-container">
+        <div class="logo-icon">
+          <!-- SVG Brain/AI Icon -->
+          <svg viewBox="0 0 24 24">
+            <path d="M12 3c-4.97 0-9 4.03-9 9 0 2.12.74 4.07 1.97 5.61L4.35 19.4c-.39.39-.39 1.02 0 1.41.39.39 1.02.39 1.41 0l1.9-1.9C9.22 19.58 10.57 20 12 20c4.97 0 9-4.03 9-9s-4.03-9-9-9zm0 15c-3.31 0-6-2.69-6-6s2.69-6 6-6 6 2.69 6 6-2.69 6-6 6zm-1-8h2v2h-2zm0-4h2v2h-2zm0 8h2v2h-2z"/>
+          </svg>
+        </div>
+        <div class="logo-text">Aegis Attendance</div>
+      </div>
+      
+      <nav class="nav-menu">
+        <li class="nav-item">
+          <a class="nav-link active" data-tab="overview">
+            <!-- SVG Home/Dashboard -->
+            <svg viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
+            Overview
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" data-tab="tracker">
+            <!-- SVG Camera/Video -->
+            <svg viewBox="0 0 24 24"><path d="M17 10.5V7c0-.55-.45-1-1-1H4c-.55 0-1 .45-1 1v10c0 .55.45 1 1 1h12c.55 0 1-.45 1-1v-3.5l4 4v-11l-4 4zM14 13h-3v3H9v-3H6v-2h3V8h2v3h3v2z"/></svg>
+            Live Recognition
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" data-tab="directory">
+            <!-- SVG Users -->
+            <svg viewBox="0 0 24 24"><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5s-3 1.34-3 3 1.34 3 3 3zm-8 0c1.66 0 3-1.34 3-3S9.66 5 8 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/></svg>
+            Student Directory
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" data-tab="register">
+            <!-- SVG User Add -->
+            <svg viewBox="0 0 24 24"><path d="M15 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm-9-2V7H4v3H1v2h3v3h2v-3h3v-2H6zm9 4c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+            Register Student
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" data-tab="trainer">
+            <!-- SVG Brain/Train -->
+            <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/></svg>
+            Model Trainer
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" data-tab="risk">
+            <!-- SVG Alert/Risk -->
+            <svg viewBox="0 0 24 24"><path d="M1 21h22L12 2 1 21zm12-3h-2v-2h2v2zm0-4h-2v-4h2v4z"/></svg>
+            Risk Calculator
+          </a>
+        </li>
+      </nav>
+      
+      <div class="sidebar-footer">
+        <div class="system-time" id="sidebar-time">00:00:00</div>
+        <div class="system-status">
+          <span class="status-dot"></span>
+          <span>System Active</span>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Main Content Panel -->
+    <main class="main-content">
+      
+      <!-- Tab 1: Overview -->
+      <section id="overview" class="page-section active">
+        <div class="page-header">
+          <h1 class="page-title">Overview Dashboard</h1>
+          <p class="page-subtitle">Real-time attendance summaries, database diagnostics, and metrics.</p>
+        </div>
+        
+        <!-- Stats Widgets -->
+        <div class="grid-stats">
+          <div class="glass-card stat-card">
+            <div class="stat-icon primary">
+              <svg viewBox="0 0 24 24"><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5s-3 1.34-3 3 1.34 3 3 3zm-8 0c1.66 0 3-1.34 3-3S9.66 5 8 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5z"/></svg>
+            </div>
+            <div class="stat-info">
+              <span class="stat-label">Total Students</span>
+              <span class="stat-value" id="stat-students">0</span>
+            </div>
+          </div>
+          <div class="glass-card stat-card">
+            <div class="stat-icon secondary">
+              <svg viewBox="0 0 24 24"><path d="M9 11H7v2h2v-2zm4 0h-2v2h2v-2zm4 0h-2v2h2v-2zm2-7h-1V2h-2v2H8V2H6v2H5c-1.11 0-1.99.9-1.99 2L3 20c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 16H5V9h14v11z"/></svg>
+            </div>
+            <div class="stat-info">
+              <span class="stat-label">Total class days</span>
+              <span class="stat-value" id="stat-days">0</span>
+            </div>
+          </div>
+          <div class="glass-card stat-card">
+            <div class="stat-icon success">
+              <svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>
+            </div>
+            <div class="stat-info">
+              <span class="stat-label">Avg Attendance</span>
+              <span class="stat-value" id="stat-avg-attendance">0%</span>
+            </div>
+          </div>
+          <div class="glass-card stat-card">
+            <div class="stat-icon danger">
+              <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/></svg>
+            </div>
+            <div class="stat-info">
+              <span class="stat-label">Students at Risk</span>
+              <span class="stat-value" id="stat-risk">0</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="grid-2col">
+          <!-- Chart Card -->
+          <div class="glass-card">
+            <h3 class="card-header-title">Attendance & Performance Analytics</h3>
+            <div style="height: 250px; position: relative;">
+              <canvas id="attendanceChart"></canvas>
+            </div>
+          </div>
+          
+          <!-- Quick Actions -->
+          <div class="glass-card">
+            <h3 class="card-header-title">Quick Actions</h3>
+            <div style="display: flex; flex-direction: column; gap: 1rem;">
+              <button class="btn btn-primary" onclick="switchTab('tracker')">
+                <svg viewBox="0 0 24 24" style="width: 18px; height: 18px; fill: white;"><path d="M17 10.5V7c0-.55-.45-1-1-1H4c-.55 0-1 .45-1 1v10c0 .55.45 1 1 1h12c.55 0 1-.45 1-1v-3.5l4 4v-11l-4 4z"/></svg>
+                Launch Attendance Stream
+              </button>
+              <button class="btn btn-secondary" onclick="switchTab('register')">Register New Student</button>
+              <button class="btn btn-secondary" onclick="switchTab('trainer')">Open Model Trainer</button>
+              <button class="btn btn-secondary" onclick="switchTab('risk')">Calculate Academic Risk</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Recent Logs Table -->
+        <div class="glass-card">
+          <h3 class="card-header-title">Recent Attendance Logs</h3>
+          <div class="table-container">
+            <table class="custom-table" id="recent-logs-table">
+              <thead>
+                <tr>
+                  <th>Student ID</th>
+                  <th>Name</th>
+                  <th>Date</th>
+                  <th>Time Recorded</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td colspan="5" style="text-align: center; color: var(--text-muted);">Loading log records...</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- Tab 2: Live Recognition Stream -->
+      <section id="tracker" class="page-section">
+        <div class="page-header">
+          <h1 class="page-title">Live Video Tracker</h1>
+          <p class="page-subtitle">Real-time face recognition and automatic database attendance logging.</p>
+        </div>
+        
+        <div class="grid-2col">
+          <!-- Video Stream Card -->
+          <div class="glass-card" style="padding: 1.25rem;">
+            <h3 class="card-header-title">Real-Time Camera Recognition</h3>
+            <div class="video-wrapper" id="video-feed-container">
+              <div class="scanline"></div>
+              <!-- MJPEG image source -->
+              <img id="video-stream" class="video-feed-img" alt="Camera Stream">
+              
+              <div class="video-placeholder" id="video-stream-placeholder">
+                <svg viewBox="0 0 24 24">
+                  <path d="M17 10.5V7c0-.55-.45-1-1-1H4c-.55 0-1 .45-1 1v10c0 .55.45 1 1 1h12c.55 0 1-.45 1-1v-3.5l4 4v-11l-4 4z"/>
+                </svg>
+                <p>Webcam is currently inactive.</p>
+              </div>
+            </div>
+            
+            <div class="card-action-bar">
+              <button class="btn btn-primary" id="btn-start-stream">Start Attendance Stream</button>
+              <button class="btn btn-danger" id="btn-stop-stream" disabled>Stop Feed</button>
+            </div>
+          </div>
+          
+          <!-- Live Session Records -->
+          <div class="glass-card" style="display: flex; flex-direction: column;">
+            <h3 class="card-header-title">Active Session Logs</h3>
+            <div style="flex: 1; overflow-y: auto; max-height: 380px;" class="table-container">
+              <table class="custom-table" id="session-logs-table">
+                <thead>
+                  <tr>
+                    <th>Time</th>
+                    <th>Student Name</th>
+                    <th>Status</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td colspan="3" style="text-align: center; color: var(--text-muted);">Session inactive. Start the stream to record.</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Tab 3: Student Directory -->
+      <section id="directory" class="page-section">
+        <div class="page-header">
+          <h1 class="page-title">Student Directory</h1>
+          <p class="page-subtitle">View database profiles, academic attendance rates, and risk statuses.</p>
+        </div>
+        
+        <div class="glass-card">
+          <div class="search-container">
+            <svg class="search-icon" viewBox="0 0 24 24">
+              <path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/>
+            </svg>
+            <input type="text" class="search-input" id="search-students" placeholder="Search students by name or ID...">
+          </div>
+          
+          <div class="table-container">
+            <table class="custom-table" id="students-directory-table">
+              <thead>
+                <tr>
+                  <th>Student ID</th>
+                  <th>Name</th>
+                  <th>Classes Logged</th>
+                  <th>Attendance Rate</th>
+                  <th>Risk Analysis</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td colspan="5" style="text-align: center; color: var(--text-muted);">Fetching student records...</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- Tab 4: Register & Face Capture -->
+      <section id="register" class="page-section">
+        <div class="page-header">
+          <h1 class="page-title">Student Registration</h1>
+          <p class="page-subtitle">Add a new student profile and run WebRTC capture for training faces.</p>
+        </div>
+        
+        <div class="grid-2col">
+          <!-- Register Form -->
+          <div class="glass-card" id="register-form-card">
+            <h3 class="card-header-title">Profile Information</h3>
+            <form id="student-register-form" onsubmit="registerStudent(event)">
+              <div class="form-group">
+                <label class="form-label">Student ID (Numeric)</label>
+                <input type="number" class="form-input" id="reg-student-id" placeholder="e.g. 101" required min="1">
+              </div>
+              <div class="form-group">
+                <label class="form-label">Full Name</label>
+                <input type="text" class="form-input" id="reg-student-name" placeholder="e.g. John Doe" required>
+              </div>
+              <button type="submit" class="btn btn-primary" style="width: 100%;">Create Student Record</button>
+            </form>
+            
+            <div id="registration-success-msg" style="display:none; margin-top: 1.5rem;" class="badge success">
+              Student registered in database! Setting up webcam...
+            </div>
+          </div>
+          
+          <!-- Webcam Capture Panel -->
+          <div class="glass-card" id="webcam-capture-card">
+            <h3 class="card-header-title">Face Snapshot Capture (WebRTC)</h3>
+            <div class="webrtc-container">
+              <video id="webrtc-video-element" class="webrtc-video" autoplay playsinline muted></video>
+              <canvas id="hidden-canvas" style="display: none;" width="640" height="480"></canvas>
+              
+              <div class="progress-container" id="capture-progress-block" style="display: none;">
+                <div class="progress-info">
+                  <span id="capture-progress-text">Capturing face samples...</span>
+                  <span id="capture-count">0/100</span>
+                </div>
+                <div class="progress-bar-bg">
+                  <div class="progress-bar-fill" id="capture-progress-bar"></div>
+                </div>
+              </div>
+              
+              <button class="btn btn-primary" id="btn-start-capture" disabled>Capture Face Samples</button>
+              
+              <!-- Thumbnails Grid -->
+              <div style="margin-top: 1rem;">
+                <span class="form-label">Captured Face Grid:</span>
+                <div class="dataset-preview-grid" id="thumbnails-preview-container">
+                  <!-- Thumbnails added dynamically -->
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Tab 5: Model Trainer -->
+      <section id="trainer" class="page-section">
+        <div class="page-header">
+          <h1 class="page-title">Model Trainer</h1>
+          <p class="page-subtitle">Compile the LBPH facial recognition database so the camera feed can detect profiles.</p>
+        </div>
+        
+        <div class="grid-2col">
+          <!-- Instructions / Stats -->
+          <div class="glass-card">
+            <h3 class="card-header-title">Facial Model Parameters</h3>
+            <p style="font-size: 0.95rem; line-height: 1.6; color: var(--text-muted); margin-bottom: 1.5rem;">
+              Training takes all student photographs saved in the <code>dataset/</code> folder and compiles their facial patterns into a Local Binary Patterns Histograms (LBPH) data matrix. Once completed, the model will output <code>trainer.yml</code>.
+            </p>
+            
+            <div style="display: flex; flex-direction: column; gap: 1rem; margin-bottom: 2rem;">
+              <div style="display: flex; justify-content: space-between; border-bottom: 1px solid var(--panel-border); padding-bottom: 0.5rem;">
+                <span>Training Algorithm:</span>
+                <strong style="color: var(--accent-secondary);">LBPH Face Recognizer</strong>
+              </div>
+              <div style="display: flex; justify-content: space-between; border-bottom: 1px solid var(--panel-border); padding-bottom: 0.5rem;">
+                <span>Dataset Target:</span>
+                <strong>dataset/*.jpg</strong>
+              </div>
+              <div style="display: flex; justify-content: space-between; border-bottom: 1px solid var(--panel-border); padding-bottom: 0.5rem;">
+                <span>Binary Model Output:</span>
+                <strong>trainer/trainer.yml</strong>
+              </div>
+            </div>
+            
+            <button class="btn btn-primary" id="btn-run-training" style="width: 100%;">Compile Facial Dataset</button>
+          </div>
+          
+          <!-- Compilation Output -->
+          <div class="glass-card" style="display: flex; flex-direction: column;">
+            <h3 class="card-header-title">Compilation Logs</h3>
+            <div class="console-log" id="training-console">
+              <div class="console-line info">> System standby. Click Compile to train.</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Tab 6: Risk Predictor -->
+      <section id="risk" class="page-section">
+        <div class="page-header">
+          <h1 class="page-title">Risk Analysis Calculator</h1>
+          <p class="page-subtitle">Evaluates academic failure risk using a Decision Tree Classifier trained on assignment/internal marks.</p>
+        </div>
+        
+        <div class="grid-2col">
+          <!-- Input Calculator Form -->
+          <div class="glass-card">
+            <h3 class="card-header-title">Predictive Risk Assessment</h3>
+            <form id="risk-prediction-form" onsubmit="calculateRisk(event)">
+              <div class="form-group">
+                <label class="form-label">Attendance Percentage (%)</label>
+                <input type="number" class="form-input" id="risk-attendance" min="0" max="100" placeholder="e.g. 78" required>
+              </div>
+              
+              <div class="form-row">
+                <div class="form-group">
+                  <label class="form-label">Internal Exam Score (%)</label>
+                  <input type="number" class="form-input" id="risk-internal" min="0" max="100" placeholder="e.g. 65" required>
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Assignment Score (%)</label>
+                  <input type="number" class="form-input" id="risk-assignment" min="0" max="100" placeholder="e.g. 70" required>
+                </div>
+              </div>
+              
+              <button type="submit" class="btn btn-primary" style="width: 100%;">Evaluate Risk Level</button>
+            </form>
+            
+            <!-- Result Output -->
+            <div class="predict-result-card" id="risk-result-box">
+              <h4 class="predict-title" id="risk-result-title">
+                <!-- Icon and status will render dynamically -->
+              </h4>
+              <p class="predict-desc" id="risk-result-text"></p>
+            </div>
+          </div>
+          
+          <!-- Flagged Students at Risk list -->
+          <div class="glass-card" style="display: flex; flex-direction: column;">
+            <h3 class="card-header-title" style="color: var(--danger);">Students Currently Flagged At Risk</h3>
+            <p style="font-size: 0.9rem; color: var(--text-muted); margin-bottom: 1rem;">
+              Students with actual database attendance rates below 75% or predicted failing grades.
+            </p>
+            
+            <div style="flex: 1; overflow-y: auto; max-height: 300px;" class="table-container">
+              <table class="custom-table" id="flagged-students-table">
+                <thead>
+                  <tr>
+                    <th>ID</th>
+                    <th>Student Name</th>
+                    <th>Attendance %</th>
+                    <th>Risk Rating</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td colspan="4" style="text-align: center; color: var(--text-muted);">Loading system flags...</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </section>
+
+    </main>
+  </div>
+
+  <!-- Main JS file -->
+  <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+</body>
+</html>
